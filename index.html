@@ -2,6 +2,9 @@
 <script src="usuarios.js"></script>
 <script>
     var hashmd5  = ""; 
+    var key = CryptoJS.enc.Hex.parse('000102030405060708090a0b0c0d0e0f');
+    var iv  = CryptoJS.enc.Hex.parse('101112131415161718191a1b1c1d1e1f');
+
     var JsonFormatter = {
         stringify: function (cipherParams) {
             var jsonObj = {
@@ -30,7 +33,7 @@
             return cipherParams;
         }
     };
-</script>
+</script> 
 
 
 <form id='form'>
@@ -51,8 +54,10 @@
     gebi('form').onsubmit = function(){       
         //md5 do Login:Senha
         hashmd5 = CryptoJS.MD5( gebi("login").value+":"+gebi("senha").value );
-          
-        if( typeof usuarios[hashmd5] == 'number' ){
+
+        var valida_user = CryptoJS.AES.encrypt(hashmd5.toString(), key, { iv: iv }).toString();
+
+        if( typeof usuarios[valida_user] == 'number' ){
             
                 var script = document.createElement('script');
                 script.onload = function() { callback_loading(); };
