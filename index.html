@@ -1,4 +1,5 @@
 <script src="lib.js"></script>
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
 <script src="usuarios.js"></script>
 <script>
     var hashmd5  = ""; 
@@ -55,7 +56,7 @@
         //md5 do Login:Senha
         hashmd5 = CryptoJS.MD5( gebi("login").value+":"+gebi("senha").value );
 
-        var valida_user = CryptoJS.AES.encrypt(hashmd5.toString(), key, { iv: iv }).toString();
+        var valida_user = CryptoJS.SHA1(hashmd5.toString());
 
         if( typeof usuarios[valida_user] == 'number' ){
             
