@@ -1,0 +1,92 @@
+<script src="lib.js"></script>
+<script src="usuarios.js"></script>
+<script>
+    var hashmd5  = ""; 
+    var JsonFormatter = {
+        stringify: function (cipherParams) {
+            var jsonObj = {
+                ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)
+            };
+            if (cipherParams.iv) {
+                jsonObj.iv = cipherParams.iv.toString();
+            }
+            if (cipherParams.salt) {
+                jsonObj.s = cipherParams.salt.toString();
+            }
+            return JSON.stringify(jsonObj);
+        },
+
+        parse: function (jsonStr) {
+            var jsonObj = JSON.parse(jsonStr);
+            var cipherParams = CryptoJS.lib.CipherParams.create({
+                ciphertext: CryptoJS.enc.Base64.parse(jsonObj.ct)
+            });
+            if (jsonObj.iv) {
+                cipherParams.iv = CryptoJS.enc.Hex.parse(jsonObj.iv)
+            }
+            if (jsonObj.s) {
+                cipherParams.salt = CryptoJS.enc.Hex.parse(jsonObj.s)
+            }
+            return cipherParams;
+        }
+    };
+</script>
+
+
+<form id='form'>
+    <input id='login'><br>
+    <input id='senha'><br>
+    <input type='submit' id='logar'>
+</form>
+
+<script type="text/javascript">
+    function gebi(id){
+        return document.getElementById(id);
+    }
+
+    function procurarLogin(){
+
+    }
+
+    gebi('form').onsubmit = function(){       
+        //md5 do Login:Senha
+        hashmd5 = CryptoJS.MD5( gebi("login").value+":"+gebi("senha").value );
+          
+        if( typeof usuarios[hashmd5] == 'number' ){
+            
+                var script = document.createElement('script');
+                script.onload = function() { callback_loading(); };
+                
+                //TODO: O nome deve ser descoberto com a formula do email, aqui coloquei na mão pq já sei a hash md5
+                script.src = "facaafbfcec84.js";
+
+                document.getElementsByTagName('head')[0].appendChild(script);
+
+        }else{
+            alert("Usuario nao existe, tente novamente");
+        }
+
+        return false;   
+    }
+
+    function callback_loading(){
+        var total = Clientes.length;
+
+        alert("Voce tem "+Clientes.length+" clientes para consultar");
+
+        for(x=0; x<total; x++){
+            var decrypted = CryptoJS.AES.decrypt(Clientes[x], hashmd5.toString() , { format: JsonFormatter });
+            var quemEh = decrypted.toString(CryptoJS.enc.Utf8);
+
+            var node = document.createElement("LI");
+            var textnode = document.createTextNode(quemEh);
+            node.appendChild(textnode);
+            document.getElementById("lista_clientes").appendChild(node);
+        }
+    }
+    
+
+</script>
+
+<ul id="lista_clientes">
+</ul>
